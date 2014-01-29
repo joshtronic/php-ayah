@@ -1,0 +1,15 @@
+{
+	"name":        "areyouahuman/PHP",
+	"description": "Are You a Human PHP Bundle",
+	"license":     "MIT",
+	"authors": [{
+		"name":  "Elvis “Bear” Jakupovic",
+		"email": "support@areyouahuman.com"
+	}, {
+		"name":  "Joshua Sherman",
+		"email": "josh@gravityblvd.com"
+	}],
+	"autoload": {
+		"classmap": ["src/"]
+	}
+}
