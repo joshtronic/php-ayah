@@ -1,5 +1,13 @@
 # Change Log for the Are You A Human PHP Integration Library
 
+## 1.1.8: 01/29/2014:
+* Bumped code to version 1.1.8
+* Made library composer friendly
+* Added some unit tests
+
+## 1.1.7: ??/??/????:
+* a bunch of awesome stuff happened, there’s simply no formal record of it
+
 ## 1.1.6: 11/12/2012:
 * minor change to doHttpsPost() so that it only uses cURL if the curl_exec()
   function is available.
