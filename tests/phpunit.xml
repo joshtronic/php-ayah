@@ -1,0 +1,22 @@
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
+	bootstrap="bootstrap.php"
+	colors="true"
+	strict="true"
+	verbose="true"
+>
+	<testsuites>
+		<testsuite name="Are You A Human? Tests">
+			<directory>./</directory>
+		</testsuite>
+	</testsuites>
+	<logging>
+		<log
+			type="coverage-html"
+			target="/tmp/php-ayah"
+			charset="UTF-8"
+			highlight="true"
+		/>
+	</logging>
+</phpunit>
