@@ -3,7 +3,7 @@
  * Are You A Human
  * PHP Integration Library
  *
- * @version 1.1.6
+ * @version 1.1.8
  *
  *    - Documentation and latest version
  *	  http://portal.areyouahuman.com/help
@@ -12,7 +12,7 @@
  *    - Discussion group
  *	  http://getsatisfaction.com/areyouahuman
  *
- * Copyright (c) 2011 AYAH LLC -- http://www.areyouahuman.com
+ * Copyright (c) 2013 AYAH LLC -- http://www.areyouahuman.com
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,12 +33,13 @@ class AYAH {
 	protected $ayah_scoring_key = '';
 	protected $ayah_web_service_host = 'ws.areyouahuman.com';
 	protected $ayah_debug_mode = FALSE;
+	protected $ayah_use_curl = TRUE;
 
 	protected $session_secret;
 
-	protected $__valid_construct_params = array('publisher_key', 'scoring_key', 'web_service_host', 'debug_mode');
+	protected $__valid_construct_params = array('publisher_key', 'scoring_key', 'web_service_host', 'debug_mode', 'use_curl');
 	protected $__message_buffer = array();
-	protected $__version_number = '1.1.6';
+	protected $__version_number = '1.1.7';
 
 	/**
 	 * Constructor
@@ -54,39 +55,26 @@ class AYAH {
 			$this->__log("DEBUG", __FUNCTION__, "The ayah_config.php file is missing.");
 		}
 
-		// If the constants exist, override with those
-		if (defined('AYAH_PUBLISHER_KEY'))
+		// Get and use any valid parameters that were passed in via the $params array.
+		foreach ((array)$this->__valid_construct_params as $partial_variable_name)
 		{
-			$this->ayah_publisher_key = AYAH_PUBLISHER_KEY;
-		}
-		if (defined('AYAH_SCORING_KEY'))
-		{
-			$this->ayah_scoring_key = AYAH_SCORING_KEY;
-		}
-		if (defined('AYAH_WEB_SERVICE_HOST'))
-		{
-			$this->ayah_web_service_host = AYAH_WEB_SERVICE_HOST;
-		}
-		if (defined('AYAH_DEBUG_MODE'))
-		{
-			$this->ayah_debug_mode = AYAH_DEBUG_MODE;
-		}
+			// Build the full variable name...and create an upper case version.
+			$variable_name = "ayah_" . $partial_variable_name;
+			$uc_variable_name = strtoupper($variable_name);
 
-		// Lastly, the params passed in can override the values set above.
-		foreach ((array)$params as $key => $value)
-		{
-			if (in_array($key, $this->__valid_construct_params))
+			// Check to see if it was passed in via $params.
+			if (isset($params[$partial_variable_name]))
 			{
-				$variable = "ayah_" . $key;
-				$this->$variable = $value;
+				$this->{$variable_name} = $params[$partial_variable_name];
 			}
-			else
+			// Check to see if it was defined in the ayah_config file.
+			elseif (defined($uc_variable_name))
 			{
-				$this->__log("ERROR", __FUNCTION__, "Unrecognized key for constructor param: '$key'");
+				$this->{$variable_name} = constant($uc_variable_name);
 			}
 		}
 
-		// Generate some warnings/errors if any of the needed variables is not set.
+		// Generate some warnings/errors if needed variables are not set.
 		if ($this->ayah_publisher_key == "")
 		{
 			$this->__log("ERROR", __FUNCTION__, "Warning: Publisher key is not defined.  This won't work.");
@@ -101,7 +89,7 @@ class AYAH {
 		}
 		else
 		{
-			$this->__log("DEBUG", __FUNCTION__, "Scoring key: '$this->ayah_scoring_key'");
+			// For security reasons, don't output the scoring key as part of the debug info.
 		}
 		if ($this->ayah_web_service_host == "")
 		{
@@ -194,7 +182,7 @@ class AYAH {
 		}
 		else
 		{
-			$this->__log("ERROR", __FUNCTION__, "Unable to score the result.  Please check that your ayah_config.php file contains your correct publisher key and scoring key.");
+			$this->__log("DEBUG", __FUNCTION__, "Unable to score the result.  Please check that your ayah_config.php file contains your correct publisher key and scoring key.");
 		}
 
 		return $result;
@@ -262,8 +250,8 @@ class AYAH {
 		}
 		rtrim($fields_string,'&');
 
-		// cURL or something else
-		if (function_exists('curl_init') and function_exists('curl_exec'))
+		// Use cURL?
+		if ($this->__use_curl())
 		{
 			// Build the cURL url.
 			$curl_url = "https://" . $hostname . $path;
@@ -295,7 +283,8 @@ class AYAH {
 		}
 		else
 		{
-			$this->__log("DEBUG", __FUNCTION__, "No cURL support....using fsockopen()");
+			// Log it.
+			$this->__log("DEBUG", __FUNCTION__, "Using fsockopen(): fields='$fields_string'");
 
 			// Build a header
 			$http_request  = "POST $path HTTP/1.1\r\n";
@@ -399,6 +388,24 @@ class AYAH {
 	}
 
 	/**
+	 * Determine whether or not cURL is available to use.
+	 *
+	 * @return boolean
+	 */
+	private function __use_curl()
+	{
+		if (FALSE === $this->ayah_use_curl)
+		{
+			return FALSE;
+		}
+		elseif (function_exists('curl_init') and function_exists('curl_exec'))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Load the config file.
 	 *
 	 * @return boolean
@@ -431,7 +438,7 @@ class AYAH {
 	 *
 	 * @return null
 	 */
-	private function __log($type, $function, $message)
+	protected function __log($type, $function, $message)
 	{
 		// Add a prefix to the message.
 		$message = __CLASS__ . "::$function: " . $message;

@@ -20,44 +20,45 @@
 */
 //******************************************************************************
 
-// Instantiate the AYAH object.
+// Instantiate the AYAH object. You need to instantiate the AYAH object
+// on each page that is using PlayThru.
 require_once("ayah.php");
 $ayah = new AYAH();
 
-// If the PlayThru does not work correctly, enable debug mode.
-//$ayah->debug_mode(TRUE);
-
-// The form submits to itself, so see if the user has submitted the form.
+// Check to see if the user has submitted the form. You will need to replace
+// 'my_submit_button_name' with the name of your 'Submit' button.
 if (array_key_exists('my_submit_button_name', $_POST))
 {
-	// Use the AYAH object to get the score.
-	$score = $ayah->scoreResult();
+        // Use the AYAH object to see if the user passed or failed the game.
+        $score = $ayah->scoreResult();
 
-	// Check the score to determine what to do.
-	if ($score)
-	{
-		// Add code to process the form.
-		echo "Hello ".$_POST['name'].", You are a human!";
-	}
-	else
-	{
-		echo "You are NOT a human!";
-	}
+        if ($score)
+        {
+                // This happens if the user passes the game. In this case,
+                // we're just displaying a congratulatory message.
+                echo "Congratulations: you are a human!";
+        }
+        else
+        {
+        		// This happens if the user does not pass the game.
+                echo "Sorry, but we were not able to verify you as human. Please try again.";
+        }
 }
 ?>
 
-<!-- Build the form tag. -->
-<!-- (note: the blank action causes the form to submit to itself) -->
+<!-- Now we're going to build the form that PlayThru is attached to.
+In this example, the form submits to itself. -->
 <form method="post" action="">
-	<!-- Build a form field. -->
-	<p>Please enter your name: <input type="text" name="name"></p>
 
-	<?php
-		// Use the AYAH object to get the HTML code needed to
-		// load and run the PlayThru.
-		echo $ayah->getPublisherHTML();
-	?>
+        <p>Please enter your name: <input type="text" name="name" /></p>
 
-	<!-- Include a submit button. -->
-	<input type="Submit" name="my_submit_button_name" value=" GO ">
+        <?php
+            // Use the AYAH object to get the HTML code needed to
+            // load and run PlayThru. You should place this code
+            // directly before your 'Submit' button.
+            echo $ayah->getPublisherHTML();
+        ?>
+        
+        <!-- Make sure the name of your 'Submit' matches the name you used on line 9. -->
+        <input type="Submit" name="my_submit_button_name" value=" Submit ">
 </form>

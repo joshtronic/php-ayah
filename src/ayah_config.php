@@ -5,8 +5,9 @@ define( 'AYAH_PUBLISHER_KEY', 'your_publisher_key_goes_here');
 define( 'AYAH_SCORING_KEY', 'your_scoring_key_goes_here');
 
 
-// Point to the default AYAH web service and set the timeout and debug_mode.
+// Set defaults for values needed by the ayah.php file.
 // (Note: you do not need to change these.)
 define( 'AYAH_WEB_SERVICE_HOST', 'ws.areyouahuman.com');
 define( 'AYAH_TIMEOUT', 0);
 define( 'AYAH_DEBUG_MODE', FALSE);
+define( 'AYAH_USE_CURL', TRUE);
